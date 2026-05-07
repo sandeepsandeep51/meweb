@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: arial, sans-serif;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .home-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .logo {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .logo span:nth-child(1) { color: #3333cc; }
+        .logo span:nth-child(2) { color: #cc0000; }
+        .logo span:nth-child(3) { color: #ffcc00; }
+        .logo span:nth-child(4) { color: #3333cc; }
+        .logo span:nth-child(5) { color: #00aa00; }
+        .logo span:nth-child(6) { color: #cc0000; }
+
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        input[type="text"] {
+            width: 450px;
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 1px solid #9aa0a6;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4d90fe;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 6px 16px;
+            font-size: 14px;
+            background: #f8f8f8;
+            border: 1px solid #cccccc;
+            border-radius: 2px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        button:hover {
+            border-color: #aaaaaa;
+            background: #eeeeee;
+        }
+
+        .tagline {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Results page */
+        .results-page {
+            display: none;
+        }
+
+        .results-header {
+            background: #ffffff;
+            border-bottom: 1px solid #ebebeb;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .results-logo {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: -1px;
+        }
+
+        .results-logo span:nth-child(1) { color: #3333cc; }
+        .results-logo span:nth-child(2) { color: #cc0000; }
+        .results-logo span:nth-child(3) { color: #ffcc00; }
+        .results-logo span:nth-child(4) { color: #3333cc; }
+        .results-logo span:nth-child(5) { color: #00aa00; }
+        .results-logo span:nth-child(6) { color: #cc0000; }
+
+        .results-input {
+            width: 400px;
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #9aa0a6;
+            border-radius: 2px;
+        }
+
+        .results-search-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            background: #f8f8f8;
+            border: 1px solid #cccccc;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .results-container {
+            max-width: 650px;
+            margin: 20px auto 20px 160px;
+        }
+
+        .result-item {
+            margin-bottom: 24px;
+        }
+
+        .result-url {
+            font-size: 13px;
+            color: #006621;
+            margin-bottom: 2px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            color: #1a0dab;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-snippet {
+            font-size: 13px;
+            color: #545454;
+            line-height: 1.5;
+        }
+
+        .result-count {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            font-size: 14px;
+            color: #666;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Home Page -->
+    <div class="home-page" id="homePage">
+        <div class="logo">
+            <span>M</span><span>e</span><span>w</span><span>e</span><span>b</span>
+        </div>
+        <div class="search-box">
+            <input type="text" id="homeQuery" placeholder="" onkeypress="handleKey(event)">
+            <div class="buttons">
+                <button onclick="doSearch()">Search</button>
+            </div>
+        </div>
+        <p class="tagline">Search the web for all possible solutions</p>
+    </div>
+
+    <!-- Results Page -->
+    <div class="results-page" id="resultsPage">
+        <div class="results-header">
+            <div class="results-logo" onclick="goHome()">
+                <span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+            </div>
+            <input type="text" class="results-input" id="resultsQuery" onkeypress="handleResultsKey(event)">
+            <button class="results-search-btn" onclick="doResultsSearch()">Search</button>
+        </div>
+        <div class="results-container">
+            <div class="result-count" id="resultCount"></div>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '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';
+
+        function handleKey(e) {
+            if (e.key === 'Enter') doSearch();
+        }
+
+        function handleResultsKey(e) {
+            if (e.key === 'Enter') doResultsSearch();
+        }
+
+        function goHome() {
+            document.getElementById('homePage').style.display = 'flex';
+            document.getElementById('resultsPage').style.display = 'none';
+        }
+
+        function doResultsSearch() {
+            const query = document.getElementById('resultsQuery').value;
+            if (!query) return;
+            fetchResults(query);
+        }
+
+        async function doSearch() {
+            const query = document.getElementById('homeQuery').value;
+            if (!query) return;
+
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('resultsPage').style.display = 'block';
+            document.getElementById('resultsQuery').value = query;
+
+            fetchResults(query);
+        }
+
+        async function fetchResults(query) {
+            const resultsDiv = document.getElementById('results');
+            const resultCount = document.getElementById('resultCount');
+
+            resultsDiv.innerHTML = '<p class="loading">Searching...</p>';
+            resultCount.innerHTML = '';
+
+            try {
+                const response = await fetch('https://api.tavily.com/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        api_key: API_KEY,
+                        query: query,
+                        max_results: 10
+                    })
+                });
+
+                const data = await response.json();
+                resultsDiv.innerHTML = '';
+                resultCount.innerHTML = `About ${data.results.length} results`;
+
+                data.results.forEach(result => {
+                    resultsDiv.innerHTML += `
+                        <div class="result-item">
+                            <div class="result-url">${result.url}</div>
+                            <a class="result-title" href="${result.url}" target="_blank">${result.title}</a>
+                            <div class="result-snippet">${result.content}</div>
+                        </div>
+                    `;
+                });
+
+            } catch (err) {
+                resultsDiv.innerHTML = '<p>Something went wrong. Try again.</p>';
+            }
+        }
+    </script>
+
+</body>
+</html>

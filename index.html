@@ -249,14 +249,10 @@
             resultCount.innerHTML = '';
 
             try {
-                const response = await fetch('https://api.tavily.com/search', {
+                    const response = await fetch('/api/search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        api_key: API_KEY,
-                        query: query,
-                        max_results: 10
-                    })
+                    body: JSON.stringify({ query: query })
                 });
 
                 const data = await response.json();

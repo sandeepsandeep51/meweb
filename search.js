@@ -14,13 +14,15 @@ export default async function handler(req, res) {
     try {
         const { query } = req.body;
 
-        const response = await fetch('https://api.tavily.com/search', {
+        const response = await fetch('https://google.serper.dev/search', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'X-API-KEY': process.env.SERPER_API_KEY,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                api_key: process.env.TAVILY_API_KEY,
-                query: query,
-                max_results: 20
+                q: query,
+                num: 10
             })
         });
 

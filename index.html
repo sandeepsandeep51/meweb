@@ -254,19 +254,18 @@
                     body: JSON.stringify({ query: query })
                 });
 
-                const data = await response.json();
-                resultsDiv.innerHTML = '';
-                resultCount.innerHTML = `About ${data.results.length} results`;
+                const results = data.organic || [];
+resultCount.innerHTML = `About ${results.length} results`;
 
-                data.results.forEach(result => {
-                    resultsDiv.innerHTML += `
-                        <div class="result-item">
-                            <div class="result-url">${result.url}</div>
-                            <a class="result-title" href="${result.url}" target="_blank">${result.title}</a>
-                            <div class="result-snippet">${result.content}</div>
-                        </div>
-                    `;
-                });
+results.forEach(result => {
+    resultsDiv.innerHTML += `
+        <div class="result-item">
+            <div class="result-url">${result.link}</div>
+            <a class="result-title" href="${result.link}" target="_blank">${result.title}</a>
+            <div class="result-snippet">${result.snippet}</div>
+        </div>
+    `;
+});
 
             } catch (err) {
                 resultsDiv.innerHTML = '<p>Something went wrong. Try again.</p>';
@@ -275,4 +274,5 @@
     </script>
 
 </body>
-</html>
+</html>resultCount.innerHTML = `About ${data.results.length} results`;
+

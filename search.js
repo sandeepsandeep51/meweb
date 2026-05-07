@@ -20,7 +20,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 api_key: process.env.TAVILY_API_KEY,
                 query: query,
-                max_results: 10
+                max_results: 20
             })
         });
 
